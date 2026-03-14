@@ -1,0 +1,17 @@
+[Unit]
+Description=AI Agent Slack Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# UPDATE THIS PATH to your Node.js binary and bot.js location
+ExecStart=/home/YOUR_USERNAME/.nvm/versions/node/v22.22.1/bin/node /home/YOUR_USERNAME/agent-setup/shared/slack-bot/bot.js
+WorkingDirectory=/home/YOUR_USERNAME/agent-setup/shared/slack-bot
+Restart=always
+RestartSec=5
+Environment=HOME=/home/YOUR_USERNAME
+Environment=PATH=/home/YOUR_USERNAME/.nvm/versions/node/v22.22.1/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target

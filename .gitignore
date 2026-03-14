@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.log
+sessions.json
+config.json
+!config.json
+shared/slack-bot/sessions.json

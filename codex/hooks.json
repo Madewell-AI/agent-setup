@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/openai/codex/main/codex-rs/config/hooks-schema.json",
+  "hooks": [
+    {
+      "event": "SessionStart",
+      "type": "command",
+      "command": "bash ~/.agent/scripts/hooks/session-start.sh"
+    },
+    {
+      "event": "AfterToolUse",
+      "type": "command",
+      "command": "bash ~/.agent/scripts/hooks/after-tool-use.sh"
+    }
+  ]
+}

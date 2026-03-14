@@ -1,0 +1,32 @@
+[
+    {
+        "id": "nightly-memory-consolidation",
+        "name": "Nightly Memory Consolidation",
+        "enabled": true,
+        "schedule": "0 23 * * *",
+        "tz": "America/New_York",
+        "prompt": "Review today's conversations and consolidate them into memory. Steps: 1) Read any session transcripts from today. 2) Write a daily note to ~/memory/YYYY-MM-DD.md summarizing the day's key events, decisions, and open loops. 3) Update ~/life/ knowledge graph entries if any durable facts were learned about projects, people, or areas. 4) Archive completed sessions.",
+        "workdir": "~",
+        "deliver": false
+    },
+    {
+        "id": "morning-summary",
+        "name": "Morning Summary",
+        "enabled": false,
+        "schedule": "0 8 * * 1-5",
+        "tz": "America/New_York",
+        "prompt": "Good morning! Prepare a brief morning summary: 1) Check today's calendar for meetings. 2) Review unread emails and flag anything urgent. 3) List the top 3 priorities based on open tasks. 4) Note any deadlines coming up this week. Keep it concise — just the highlights.",
+        "workdir": "~",
+        "deliver": true
+    },
+    {
+        "id": "weekly-review",
+        "name": "Weekly Review",
+        "enabled": false,
+        "schedule": "0 17 * * 5",
+        "tz": "America/New_York",
+        "prompt": "It's Friday — time for the weekly review. 1) Summarize what was accomplished this week (review daily notes). 2) List any open loops or unfinished tasks. 3) Suggest priorities for next week. 4) Note any patterns or insights worth remembering.",
+        "workdir": "~",
+        "deliver": true
+    }
+]

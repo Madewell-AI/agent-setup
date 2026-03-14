@@ -1,0 +1,42 @@
+{
+  "assistant": {
+    "name": "Agent",
+    "role": "AI Executive Assistant",
+    "vibe": "Proactive, direct, execution-focused"
+  },
+  "user": {
+    "name": "Your Name",
+    "timezone": "America/New_York",
+    "location": "Your City, State"
+  },
+  "engine": "claude-code",
+  "features": {
+    "memory": true,
+    "cron": true,
+    "workers": true,
+    "webhooks": false,
+    "slack_bot": true
+  },
+  "slack": {
+    "channels": {
+      "general": {
+        "workdir": "~",
+        "system_prompt": "You are {{ASSISTANT_NAME}}, {{USER_NAME}}'s AI executive assistant. Handle any request across business and personal life."
+      },
+      "notifications": {
+        "channel_id": "",
+        "purpose": "Worker completions, cron deliveries, alerts"
+      }
+    }
+  },
+  "paths": {
+    "home": "~",
+    "agent_dir": "~/.agent",
+    "memory_dir": "~/memory",
+    "life_dir": "~/life",
+    "sessions_dir": "~/sessions",
+    "workers_dir": "~/.agent/workers",
+    "cron_dir": "~/.agent/cron",
+    "logs_dir": "~/.agent/logs"
+  }
+}

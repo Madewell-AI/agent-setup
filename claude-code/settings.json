@@ -1,0 +1,44 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash ~/.agent/scripts/hooks/session-start.sh"
+                    }
+                ]
+            }
+        ],
+        "Notification": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash ~/.agent/scripts/hooks/notification.sh"
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash ~/.agent/scripts/hooks/post-tool-use.sh"
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash ~/.agent/scripts/hooks/auto-recall.sh"
+                    }
+                ]
+            }
+        ]
+    }
+}

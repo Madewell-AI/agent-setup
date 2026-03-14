@@ -1,0 +1,27 @@
+# {{ASSISTANT_NAME}} Memory
+
+## About {{USER_NAME}}
+- Name: {{USER_NAME}}
+- Timezone: {{TIMEZONE}}, Location: {{LOCATION}}
+- Role: {{USER_ROLE}}
+
+## Memory Architecture
+This system uses 4 layers:
+1. This file (MEMORY.md) — durable operating knowledge, always loaded
+2. ~/memory/YYYY-MM-DD.md — daily notes, written by nightly cron
+3. ~/life/ — PARA knowledge graph (Projects, Areas, Resources, Archives)
+4. ~/sessions/ — conversation session notes
+
+## Key Paths
+- Knowledge graph: ~/life/
+- Daily notes: ~/memory/
+- Session notes: ~/sessions/
+- Worker scripts: ~/.agent/scripts/
+- Active workers: ~/.agent/workers/active/
+- Cron jobs: ~/.agent/cron/jobs.json
+
+## Preferences
+<!-- Add preferences as you learn them -->
+<!-- Example: -->
+<!-- - No emojis unless asked -->
+<!-- - Short and direct responses -->
