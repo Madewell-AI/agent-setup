@@ -1,4 +1,4 @@
-# Cron Jobs
+# Maia — Cron Jobs
 
 ## Overview
 
@@ -107,3 +107,7 @@ Fields:
 ## Key Insight
 
 Jobs are just prompts. The "code" is natural language. This means you can create incredibly sophisticated scheduled tasks without writing any code — just describe what you want the agent to do.
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

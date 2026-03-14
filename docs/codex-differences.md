@@ -1,8 +1,8 @@
-# Codex CLI Differences
+# Maia — Codex CLI Differences
 
 ## Overview
 
-This framework supports both Claude Code and Codex CLI. While the architecture is the same, there are practical differences to be aware of.
+Maia supports both Claude Code and Codex CLI. While the architecture is the same, there are practical differences to be aware of.
 
 ## Feature Comparison
 
@@ -66,7 +66,7 @@ This framework supports both Claude Code and Codex CLI. While the architecture i
 ### Bottom Line
 - If budget isn't a constraint → Claude Code (better reasoning, full hook system)
 - If you want to minimize cost → Codex CLI (pay-per-use, built-in memory saves some overhead)
-- Both are fully capable of running the agent framework
+- Both are fully capable of running the Maia framework
 
 ## Migration
 
@@ -74,3 +74,7 @@ Moving between engines is straightforward:
 1. The shared scripts, cron system, workers, and memory all work with either engine
 2. Only the instruction file (CLAUDE.md ↔ AGENTS.md) and settings (hooks config) differ
 3. The Slack bot auto-detects which engine is installed
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

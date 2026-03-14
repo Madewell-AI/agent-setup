@@ -1,4 +1,4 @@
-# VM Setup Guide (Hetzner Cloud)
+# Maia — VM Setup Guide (Hetzner Cloud)
 
 ## Why a VM?
 
@@ -156,3 +156,7 @@ git pull origin main
 ```
 
 Then re-run the setup prompt to apply any changes.
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

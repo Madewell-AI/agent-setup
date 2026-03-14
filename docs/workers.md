@@ -1,4 +1,4 @@
-# Background Workers
+# Maia — Background Workers
 
 ## Overview
 
@@ -62,3 +62,7 @@ The heartbeat runs every 15 minutes via systemd timer:
 - Workers inherit the full tool set of the AI engine (file access, bash, web, etc.)
 - Workers run with `--dangerously-skip-permissions` (Claude) or `--approval-mode full-auto` (Codex) for unattended operation
 - Very long tasks (>30 min) should write periodic `[STATUS:]` markers so you know they're progressing
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

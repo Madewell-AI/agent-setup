@@ -1,4 +1,4 @@
-# Memory System
+# Maia — Memory System
 
 ## Overview
 
@@ -79,3 +79,7 @@ The more you use the system, the smarter it gets:
 - It builds up knowledge about your tools, workflows, and team
 
 To explicitly teach something: just tell your agent "remember that..." or "from now on, always..." and it will update the appropriate memory layer.
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

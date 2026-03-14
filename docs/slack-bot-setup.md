@@ -1,4 +1,4 @@
-# Slack Bot Setup Guide
+# Maia — Slack Bot Setup Guide
 
 ## Overview
 
@@ -142,3 +142,7 @@ Invite your bot to the channels you configured:
 **Bot crashes and restarts:**
 - The systemd service auto-restarts after 5 seconds
 - Check logs for the error: `journalctl --user -u agent-slack --since "5 minutes ago"`
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

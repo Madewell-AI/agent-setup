@@ -1,7 +1,7 @@
 {
-  "name": "agent-slack-bot",
+  "name": "maia-slack-bot",
   "version": "1.0.0",
-  "description": "AI Agent Slack Bot — Socket Mode interface for Claude Code or Codex CLI",
+  "description": "Maia Slack Bot — Socket Mode interface for Claude Code or Codex CLI",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js",

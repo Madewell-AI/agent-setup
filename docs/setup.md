@@ -1,4 +1,4 @@
-# Full Setup Guide
+# Maia — Full Setup Guide
 
 ## Prerequisites
 
@@ -124,3 +124,7 @@ Skills are markdown instruction files that give your agent domain-specific knowl
 ## Adding Cron Jobs
 
 Edit `~/.agent/cron/jobs.json` to add scheduled tasks. See [Cron Jobs](cron.md) for the job schema and examples.
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

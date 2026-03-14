@@ -1,4 +1,4 @@
-# Self-Setup Instructions — Codex CLI
+# Maia Self-Setup — Codex CLI
 
 You are setting up a new AI executive assistant using Codex CLI. Follow these steps exactly.
 

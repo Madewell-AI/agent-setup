@@ -1,5 +1,5 @@
 [Unit]
-Description=AI Agent Slack Bot
+Description=Maia Slack Bot
 After=network-online.target
 Wants=network-online.target
 

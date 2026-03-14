@@ -4,8 +4,8 @@
         "minor_version": 1
     },
     "display_information": {
-        "name": "Your Agent Name",
-        "description": "AI Executive Assistant",
+        "name": "Maia",
+        "description": "AI Executive Assistant — Powered by Maia",
         "background_color": "#1a1a2e"
     },
     "features": {
@@ -15,7 +15,7 @@
             "messages_tab_read_only_enabled": false
         },
         "bot_user": {
-            "display_name": "Your Agent Name",
+            "display_name": "Maia",
             "always_online": true
         }
     },

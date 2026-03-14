@@ -1,4 +1,4 @@
-# Self-Setup Instructions — Claude Code
+# Maia Self-Setup — Claude Code
 
 You are setting up a new AI executive assistant. Follow these steps exactly.
 

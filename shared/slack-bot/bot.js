@@ -1,5 +1,5 @@
 /**
- * AI Agent Slack Bot — Socket Mode
+ * Maia Slack Bot — Socket Mode
  *
  * Maps each Slack thread to a persistent AI agent session.
  * Supports both Claude Code and Codex CLI as the engine.
@@ -455,5 +455,5 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 // Start
 (async () => {
     await socket.start();
-    console.log(`${ASSISTANT_NAME} Slack bot is running (${ENGINE} engine)`);
+    console.log(`[Maia] ${ASSISTANT_NAME} Slack bot is running (${ENGINE} engine)`);
 })();

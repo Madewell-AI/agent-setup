@@ -1,4 +1,4 @@
-# Security
+# Maia — Security
 
 ## Threat Model
 
@@ -93,3 +93,7 @@ If you set up webhook processing:
 3. **Use Hetzner's cloud firewall** — Add an additional firewall layer at the infrastructure level
 4. **Rotate credentials** — Update API keys periodically
 5. **Back up your VM** — Hetzner offers snapshots; take one after initial setup
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

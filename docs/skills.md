@@ -1,4 +1,4 @@
-# Skills System
+# Maia — Skills System
 
 ## Overview
 
@@ -109,3 +109,7 @@ description: Read, triage, and respond to emails
 - Specify safety rules (e.g., "never send without approval")
 - Use `allowed-tools` to restrict what the skill can do (Claude Code only)
 - Test skills manually before relying on them in production
+
+---
+
+*Created by Ben Valentin. Built at Madewell AI.*

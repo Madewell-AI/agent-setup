@@ -1,8 +1,8 @@
-# Agent Setup
+# Maia
 
 > Build your own AI executive assistant — powered by Claude Code or Codex CLI.
 
-An open-source framework for creating a personal AI agent that runs 24/7 on a VM (or local machine), communicates through Slack, remembers everything, and handles tasks autonomously.
+Maia is an open-source framework for creating a personal AI agent that runs 24/7 on a VM (or local machine), communicates through Slack, remembers everything, and handles tasks autonomously.
 
 ## What You Get
 
@@ -51,7 +51,7 @@ Your VM / Machine
 | **Cost** | ~$100-200/mo (Max plan) | ~$20-200/mo (API usage) |
 | **Hook system** | Full (4 hook types) | Partial (SessionStart + AfterToolUse) |
 
-See the [setup guide](https://your-guide-url.com) for detailed cost breakdowns.
+See the [setup guide](https://agent-setup-guide.vercel.app) for detailed cost breakdowns.
 
 ### 2. Clone This Repo
 
@@ -128,6 +128,6 @@ MIT — use it however you want.
 
 ## Credits
 
-Built by [Madewell AI](https://madewell.ai) — we build custom AI agents and software for businesses.
+Created by Ben Valentin. Built at Madewell AI.
 
 If you want a fully managed, hosted version or need help customizing this for your business, [get in touch](https://madewell.ai/contact).
