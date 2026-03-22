@@ -50,7 +50,20 @@ for meta_file in "$ACTIVE_DIR"/*.json; do
             # Check for completion markers
             if grep -q '\[DONE:' "$LOG_FILE"; then
                 RESULT=$(grep '\[DONE:' "$LOG_FILE" | tail -1 | sed 's/.*\[DONE: //' | sed 's/\]//')
-                notify "Worker completed: ${DESC} — ${RESULT}"
+
+                # Skip notification for routine cron-spawned workers that post their own results.
+                # Add patterns here for workers that should complete silently.
+                # Failures always notify regardless of this filter.
+                SKIP_NOTIFY=false
+                case "$DESC" in
+                    # Example: skip notification for recurring triage workers
+                    # my-triage-*) SKIP_NOTIFY=true ;;
+                    *) ;;
+                esac
+
+                if [ "$SKIP_NOTIFY" = "false" ]; then
+                    notify "Worker completed: ${DESC} — ${RESULT}"
+                fi
                 echo "[$(date -Iseconds)] COMPLETED: ${WORKER_ID} — ${DESC} — ${RESULT}"
             elif grep -q '\[FAILED:' "$LOG_FILE"; then
                 RESULT=$(grep '\[FAILED:' "$LOG_FILE" | tail -1 | sed 's/.*\[FAILED: //' | sed 's/\]//')

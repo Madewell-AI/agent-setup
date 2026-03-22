@@ -7,6 +7,7 @@ Maia is an open-source framework for creating a personal AI agent that runs 24/7
 ## What You Get
 
 - **Persistent Memory** — 4-layer memory system (durable facts, daily notes, knowledge graph, session notes) with automatic recall on every message
+- **Self-Improving Feedback** — Automatically detects when you correct the agent and queues corrections for review, preventing the same mistakes across sessions
 - **Slack Bot Interface** — Chat with your agent through Slack with full thread support, file sharing, and live status updates
 - **Background Workers** — Spawn long-running tasks that report back when done
 - **Scheduled Jobs** — Cron system for recurring autonomous tasks (morning summaries, inbox triage, etc.)
@@ -25,6 +26,8 @@ Your VM / Machine
 │   ├── scripts/
 │   │   ├── hooks/             ← Lifecycle hooks (session start, auto-recall, etc.)
 │   │   ├── auto-recall.py     ← Memory search on every message
+│   │   ├── feedback-detector.py ← Correction detection + feedback queue
+│   │   ├── process-feedback.py  ← Review + persist queued corrections
 │   │   ├── spawn-worker.sh    ← Background task spawner
 │   │   └── heartbeat.sh       ← Worker health monitor
 │   ├── cron/                  ← Scheduled job system
