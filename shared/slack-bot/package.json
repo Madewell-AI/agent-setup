@@ -8,8 +8,7 @@
     "dev": "node --watch bot.js"
   },
   "dependencies": {
-    "@slack/socket-mode": "^2.0.0",
-    "@slack/web-api": "^7.0.0",
+    "@slack/bolt": "^4.0.0",
     "dotenv": "^16.0.0"
   }
 }

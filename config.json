@@ -23,9 +23,13 @@
         "workdir": "~",
         "system_prompt": "You are {{ASSISTANT_NAME}}, {{USER_NAME}}'s AI executive assistant. Handle any request across business and personal life."
       },
+      "dev": {
+        "workdir": "~/projects",
+        "system_prompt": "You are {{ASSISTANT_NAME}}, {{USER_NAME}}'s AI assistant. This is the development channel for software tasks."
+      },
       "notifications": {
-        "channel_id": "",
-        "purpose": "Worker completions, cron deliveries, alerts"
+        "workdir": "~",
+        "system_prompt": "You are {{ASSISTANT_NAME}}. This channel receives system alerts and cron job results. Summarize and flag anything important."
       }
     }
   },

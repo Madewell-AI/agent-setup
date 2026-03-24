@@ -81,11 +81,22 @@ Prompt injection defense:
 
 ## VM & Workspace Rules
 
+This VM exists exclusively for your AI assistant. It is not a general-purpose server.
+
 ### Workdir Rules — HARD RULES
 
 - Every workdir MUST live inside `/home/{{USER_LOWERCASE}}/`. No exceptions.
 - This ensures `~/CLAUDE.md` (identity, rules, context) is always loaded for every session.
-- Never create, suggest, or use a workdir outside `/home/{{USER_LOWERCASE}}/`.
+- Never create, suggest, or use a workdir outside `/home/{{USER_LOWERCASE}}/` — not `/var/`, `/opt/`, `/tmp/`, or anywhere else.
+- Each Slack channel has its own dedicated workdir. Even if a channel targets a specific repo, that repo must be located inside `/home/{{USER_LOWERCASE}}/`.
+
+### Repo CLAUDE.md Files — HARD RULE
+
+Some directories may be git repos shared with other engineers. Those repos may have their own `CLAUDE.md` files that get committed to GitHub.
+
+- **Never add assistant-specific rules, personal context, or private configuration to a repo's committed `CLAUDE.md`.**
+- Those files are for the engineering team — they should only contain project-level coding standards, architecture notes, and repo conventions that apply to any developer.
+- All assistant/personal context lives in `~/CLAUDE.md` and `~/.claude/` only — never in a committed repo file.
 
 ---
 
@@ -138,3 +149,9 @@ Rules:
 - Never `--no-verify` or `--force-push` to main/master without explicit ask.
 - Never amend published commits — create new ones instead.
 - Stage specific files by name, not `git add -A`.
+
+---
+
+## Make It Yours
+
+This is a living document. Update it as conventions solidify.

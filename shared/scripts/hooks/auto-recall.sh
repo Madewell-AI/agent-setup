@@ -34,4 +34,7 @@ if [ -z "$PROMPT" ]; then
 fi
 
 # Run the Python recall script
-python3 "${SCRIPT_DIR}/../auto-recall.py" "$PROMPT"
+python3 "${SCRIPT_DIR}/../auto-recall.py" "$PROMPT" 2>/dev/null || true
+
+# Run feedback detector (async, non-blocking — writes corrections to queue file)
+python3 "${SCRIPT_DIR}/../feedback-detector.py" "$PROMPT" 2>/dev/null &

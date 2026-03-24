@@ -8,20 +8,47 @@
 ## Memory Architecture
 This system uses 4 layers:
 1. This file (MEMORY.md) — durable operating knowledge, always loaded
-2. ~/memory/YYYY-MM-DD.md — daily notes, written by nightly cron
-3. ~/life/ — PARA knowledge graph (Projects, Areas, Resources, Archives)
-4. ~/sessions/ — conversation session notes
+2. ~/memory/YYYY-MM-DD.md — daily notes, written by nightly cron; read for recent context
+3. ~/life/ — PARA knowledge graph (Projects, Areas, Resources, Archives); read summary.md files for fast entity context, items.json for atomic facts
+4. ~/sessions/ — rich conversation logs (research, decisions, brainstorms)
+
+Auto-recall (UserPromptSubmit hook):
+- Fires on every message before the agent responds
+- Extracts key terms from the prompt, searches across all 4 layers
+- Script: ~/.agent/scripts/auto-recall.py
+- Hook wrapper: ~/.agent/scripts/hooks/auto-recall.sh
+- Output injected as system context — the agent sees relevant memories automatically
+
+When to write:
+- MEMORY.md: only for preferences, rules, and patterns that should persist forever
+- ~/memory/YYYY-MM-DD.md: nightly cron handles this; the agent can also append during session
+- ~/life/: when learning durable facts about a project, person, or area
+- ~/sessions/: after any significant conversation worth revisiting
+
+## Background Workers
+Long-running tasks run as background headless sessions.
+- Spawn: run ~/.agent/scripts/spawn-worker.sh "description" "prompt" /workdir
+- Check status: ls ~/.agent/workers/active/
+- Heartbeat runs every 15 min and reports completions to Slack
+- Workers write [STATUS: ...] and [DONE: ...] markers to their logs
+
+## Self-Improving Feedback System
+- Auto-feedback capture: feedback-detector.py runs on every UserPromptSubmit, detects correction patterns, queues to ~/.agent/feedback-queue.jsonl
+- Review pending feedback: python3 ~/.agent/scripts/process-feedback.py
+- Corrections become persistent memories so the same mistake isn't repeated
 
 ## Key Paths
 - Knowledge graph: ~/life/
-- Daily notes: ~/memory/
+- Daily notes: ~/memory/YYYY-MM-DD.md
 - Session notes: ~/sessions/
 - Worker scripts: ~/.agent/scripts/
 - Active workers: ~/.agent/workers/active/
 - Cron jobs: ~/.agent/cron/jobs.json
+- Logs: ~/.agent/logs/
 
 ## Preferences
 <!-- Add preferences as you learn them -->
 <!-- Example: -->
 <!-- - No emojis unless asked -->
-<!-- - Short and direct responses -->
+<!-- - Short and direct responses — lead with the answer -->
+<!-- - Prefers proactive support over reactive Q&A -->
