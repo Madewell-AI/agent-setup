@@ -4,8 +4,8 @@
         "minor_version": 1
     },
     "display_information": {
-        "name": "Maia",
-        "description": "AI Executive Assistant — Powered by Maia",
+        "name": "My Agent",
+        "description": "AI Assistant — Powered by Claude Code",
         "background_color": "#1a1a2e"
     },
     "features": {
@@ -15,30 +15,59 @@
             "messages_tab_read_only_enabled": false
         },
         "bot_user": {
-            "display_name": "Maia",
+            "display_name": "My Agent",
             "always_online": true
-        }
+        },
+        "slash_commands": [
+            {
+                "command": "/workers",
+                "description": "List active and recent background workers",
+                "should_escape": false
+            },
+            {
+                "command": "/spawn",
+                "description": "Spawn a background worker in this channel's workdir",
+                "usage_hint": "<prompt>",
+                "should_escape": false
+            },
+            {
+                "command": "/context",
+                "description": "Show this channel's workdir and context",
+                "should_escape": false
+            },
+            {
+                "command": "/clear",
+                "description": "Clear conversation history for this channel",
+                "should_escape": false
+            },
+            {
+                "command": "/restart",
+                "description": "Restart the Slack bot",
+                "should_escape": false
+            }
+        ]
     },
     "oauth_config": {
         "scopes": {
             "bot": [
                 "app_mentions:read",
                 "channels:history",
+                "channels:join",
                 "channels:manage",
                 "channels:read",
                 "chat:write",
-                "files:read",
-                "files:write",
+                "chat:write.public",
+                "commands",
                 "groups:history",
                 "groups:read",
-                "groups:write",
                 "im:history",
                 "im:read",
                 "im:write",
                 "mpim:history",
                 "mpim:read",
-                "reactions:write",
-                "users:read"
+                "users:read",
+                "files:read",
+                "files:write"
             ]
         }
     },
