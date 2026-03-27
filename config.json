@@ -4,10 +4,14 @@
     "role": "AI Executive Assistant",
     "vibe": "Proactive, direct, execution-focused"
   },
+  "mode": "personal",
   "user": {
     "name": "Your Name",
     "timezone": "America/New_York",
     "location": "Your City, State"
+  },
+  "team": {
+    "users": {}
   },
   "engine": "claude-code",
   "features": {

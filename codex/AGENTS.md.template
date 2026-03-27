@@ -12,10 +12,18 @@
 
 ## About You
 
+{{#PERSONAL_MODE}}
 - **Name:** {{USER_NAME}}
 - **Timezone:** {{TIMEZONE}}
 - **Location:** {{LOCATION}}
 - **Role:** {{USER_ROLE}}
+{{/PERSONAL_MODE}}
+{{#TEAM_MODE}}
+- **Organization:** {{ORG_NAME}}
+- **Timezone:** {{TIMEZONE}}
+
+This is a *team* assistant — multiple people interact with you via Slack. Each message includes who sent it (name, role). Adapt responses to the person you're talking to. Never share one user's private context with another.
+{{/TEAM_MODE}}
 
 ---
 
