@@ -1,9 +1,28 @@
 # {{ASSISTANT_NAME}} Memory
 
+{{#PERSONAL_MODE}}
 ## About {{USER_NAME}}
 - Name: {{USER_NAME}}
 - Timezone: {{TIMEZONE}}, Location: {{LOCATION}}
 - Role: {{USER_ROLE}}
+{{/PERSONAL_MODE}}
+{{#TEAM_MODE}}
+## Team
+- Organization: {{ORG_NAME}}
+- Timezone: {{TIMEZONE}}
+
+### Team Members
+Track each team member at `~/life/areas/people/{slug}/summary.md`.
+When you first interact with someone new, create their entry:
+```
+mkdir -p ~/life/areas/people/{name-slug}
+# Write summary.md with: name, Slack ID, role, preferences, expertise
+# Write items.json with atomic facts: [{"fact": "..."}]
+```
+
+Auto-recall loads the current speaker's file on every message.
+Store per-member preferences (communication style, technical depth, etc.) in their summary.md.
+{{/TEAM_MODE}}
 
 ## Memory Architecture
 This system uses 4 layers:
@@ -23,6 +42,7 @@ When to write:
 - MEMORY.md: only for preferences, rules, and patterns that should persist forever
 - ~/memory/YYYY-MM-DD.md: nightly cron handles this; the agent can also append during session
 - ~/life/: when learning durable facts about a project, person, or area
+- ~/life/areas/people/: when learning about a team member's preferences, expertise, or work patterns
 - ~/sessions/: after any significant conversation worth revisiting
 
 ## Background Workers

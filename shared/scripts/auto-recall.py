@@ -10,6 +10,7 @@ Searches: ~/life/ (knowledge graph), ~/sessions/, ~/memory/ (daily notes),
 Designed to run fast (<500ms) on every message.
 """
 
+import argparse
 import json
 import os
 import re
@@ -289,24 +290,78 @@ def search_todays_jsonl(pattern: re.Pattern) -> list[str]:
     return results
 
 
+def load_user_context(user_id: str, user_name: str) -> list[str]:
+    """Always load the knowledge graph entry for a specific team member.
+
+    Checks ~/life/areas/people/ for a directory matching the user's Slack ID
+    or slugified name. Returns their summary and facts if found.
+    """
+    results = []
+    people_dir = HOME / "life" / "areas" / "people"
+    if not people_dir.exists():
+        return results
+
+    # Build candidate directory names: Slack ID, then slugified name
+    candidates = []
+    if user_id:
+        candidates.append(people_dir / user_id)
+    if user_name:
+        slug = re.sub(r"[^a-z0-9]+", "-", user_name.lower()).strip("-")
+        candidates.append(people_dir / slug)
+
+    for person_dir in candidates:
+        if not person_dir.exists():
+            continue
+        summary = person_dir / "summary.md"
+        if summary.exists():
+            try:
+                content = summary.read_text(errors="replace")
+                results.append(f"--- Team member: {user_name or user_id} ---")
+                results.extend(content.strip().splitlines()[:20])
+                results.append("")
+            except (OSError, PermissionError):
+                pass
+        items = person_dir / "items.json"
+        if items.exists():
+            try:
+                facts = json.loads(items.read_text())
+                for item in facts[:10]:
+                    if isinstance(item, dict):
+                        results.append(f"  - {item.get('fact', '')}")
+                if facts:
+                    results.append("")
+            except (OSError, PermissionError, json.JSONDecodeError):
+                pass
+        break  # Found a match, stop looking
+
+    return results
+
+
 def main():
-    # Get message from stdin JSON or CLI argument
-    message = ""
-    if len(sys.argv) > 1:
-        message = " ".join(sys.argv[1:])
-    elif not sys.stdin.isatty():
+    # Parse arguments — supports both positional message and team user flags
+    parser = argparse.ArgumentParser(description="Auto-recall memory search")
+    parser.add_argument("message", nargs="*", default=[])
+    parser.add_argument("--user-id", default="")
+    parser.add_argument("--user-name", default="")
+    args = parser.parse_args()
+
+    # Get message from CLI args or stdin JSON
+    message = " ".join(args.message) if args.message else ""
+    if not message and not sys.stdin.isatty():
         try:
             data = json.load(sys.stdin)
             message = data.get("message", data.get("prompt", data.get("content", "")))
             if isinstance(message, list):
                 message = " ".join(str(m) for m in message)
         except (json.JSONDecodeError, AttributeError):
-            # Try reading as plain text
             sys.stdin.seek(0)
             message = sys.stdin.read().strip()
 
     if not message:
         return
+
+    # Strip [team_user:...] marker from message before extracting search terms
+    message = re.sub(r"\[team_user:[^\]]+\]", "", message).strip()
 
     terms = extract_terms(message)
     if not terms:
@@ -318,6 +373,11 @@ def main():
 
     # Search all layers
     all_results = []
+
+    # Team mode: always load the current user's context first
+    if args.user_id or args.user_name:
+        all_results.extend(load_user_context(args.user_id, args.user_name))
+
     all_results.extend(search_knowledge_graph(pattern))
     all_results.extend(search_session_summaries(pattern))
     all_results.extend(search_sessions(pattern))

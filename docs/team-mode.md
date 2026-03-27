@@ -83,6 +83,69 @@ When a message arrives, the bot:
 
 User info is cached in memory for the lifetime of the bot process.
 
+## Team Memory
+
+In team mode, the memory system becomes user-aware. Each team member gets their own knowledge graph entry, and the agent tracks per-person preferences, expertise, and interaction history.
+
+### Per-Member Knowledge Graph
+
+Each team member gets an entry at `~/life/areas/people/{name-slug}/`:
+
+```
+~/life/areas/people/
+├── sarah-chen/
+│   ├── summary.md    # Name, Slack ID, role, preferences, expertise
+│   └── items.json    # Atomic facts: [{"fact": "Prefers Go over Python"}]
+├── mike-rodriguez/
+│   ├── summary.md
+│   └── items.json
+```
+
+The agent creates these automatically when it first interacts with someone. You can also pre-populate them to give the agent a head start.
+
+### Auto-Recall Per User
+
+When a team member sends a message, the bot embeds a `[team_user:U08ABC123:Sarah Chen]` marker in the prompt. The auto-recall hook extracts this and:
+
+1. **Always loads** that user's `~/life/areas/people/` entry (no keyword match needed)
+2. Runs the normal keyword search across all memory layers
+
+This means Maia always has the current speaker's context — their preferences, expertise, and prior interactions — before responding.
+
+### Feedback Attribution
+
+When the feedback detector identifies a correction (e.g., "don't do that", "use X instead"), it tags the feedback queue entry with the team member's Slack ID and name. This lets you see which team member made each correction when reviewing feedback:
+
+```
+[1] (HIGH confidence) [Sarah Chen] 2026-03-27T14:30
+    Signals: don't use, instead
+    Message: Don't use var, use const instead in all new code
+```
+
+### Nightly Consolidation
+
+The nightly memory consolidation cron job:
+- Notes which team members were involved in each interaction
+- Updates per-member entries at `~/life/areas/people/` with any new preferences or patterns learned
+
+### Bootstrapping Team Members
+
+You can pre-create entries for your team:
+
+```bash
+mkdir -p ~/life/areas/people/sarah-chen
+cat > ~/life/areas/people/sarah-chen/summary.md << 'EOF'
+# Sarah Chen
+
+- Slack ID: U08ABC123
+- Role: Senior Engineer
+- Expertise: Go, Python, backend systems
+- Preferences: Concise answers, prefers code examples over explanations
+EOF
+```
+
+Or let the agent learn organically — it will create entries as it interacts with each person.
+
 ## Recommended Setup
 
 ### Separate Infrastructure

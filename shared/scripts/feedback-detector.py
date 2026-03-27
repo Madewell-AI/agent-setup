@@ -7,6 +7,7 @@ that the agent reads on next session start to decide what to persist as memories
 Designed to run fast (<100ms) on every UserPromptSubmit.
 """
 
+import argparse
 import json
 import os
 import re
@@ -128,10 +129,14 @@ def extract_user_message(raw: str) -> str:
 
 
 def main():
-    message = ""
-    if len(sys.argv) > 1:
-        message = " ".join(sys.argv[1:])
-    elif not sys.stdin.isatty():
+    parser = argparse.ArgumentParser(description="Feedback correction detector")
+    parser.add_argument("message", nargs="*", default=[])
+    parser.add_argument("--user-id", default="")
+    parser.add_argument("--user-name", default="")
+    args = parser.parse_args()
+
+    message = " ".join(args.message) if args.message else ""
+    if not message and not sys.stdin.isatty():
         try:
             data = json.load(sys.stdin)
             message = data.get("message", data.get("prompt", data.get("content", "")))
@@ -145,9 +150,16 @@ def main():
 
     # Strip system prompts to only analyze the user's actual words
     message = extract_user_message(message)
+    # Strip [team_user:...] marker
+    message = re.sub(r"\[team_user:[^\]]+\]", "", message).strip()
 
     result = detect_correction(message)
     if result:
+        # Tag with team member info if available
+        if args.user_id:
+            result["user_id"] = args.user_id
+        if args.user_name:
+            result["user_name"] = args.user_name
         append_to_queue(result)
 
 

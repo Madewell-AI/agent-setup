@@ -41,7 +41,9 @@ def main():
     for i, entry in enumerate(entries, 1):
         conf = entry.get("confidence", 0)
         conf_label = "HIGH" if conf >= 0.75 else "MEDIUM" if conf >= 0.5 else "LOW"
-        print(f"[{i}] ({conf_label} confidence) {entry.get('timestamp', '?')[:16]}")
+        user = entry.get("user_name", "")
+        user_label = f" [{user}]" if user else ""
+        print(f"[{i}] ({conf_label} confidence){user_label} {entry.get('timestamp', '?')[:16]}")
         print(f"    Signals: {', '.join(entry.get('signals', []))}")
         print(f"    Message: {entry.get('message', '?')}")
         print("")

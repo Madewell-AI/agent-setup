@@ -40,8 +40,13 @@ Create the Claude Code memory directory:
 mkdir -p ~/.claude/projects/-home-$(echo $USER | tr '[:upper:]' '[:lower:]' | tr ' ' '-')/memory/
 ```
 
-Read ~/agent-setup/shared/memory/MEMORY.md.template, replace variables, and write to:
+Read ~/agent-setup/shared/memory/MEMORY.md.template, replace variables (including mode-conditional blocks, same as CLAUDE.md), and write to:
 ~/.claude/projects/-home-$(echo $USER | tr '[:upper:]' '[:lower:]' | tr ' ' '-')/memory/MEMORY.md
+
+If in team mode, also create the people directory for team member profiles:
+```
+mkdir -p ~/life/areas/people/
+```
 
 ## Step 6: Set Up Knowledge Graph
 

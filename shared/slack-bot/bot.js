@@ -472,7 +472,8 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
     // Follow-up turn on active streaming process — light prompt (context already loaded)
     entry = existingProcess;
     const sender = TEAM_MODE && userInfo ? formatUserContext(userInfo) : USER_NAME;
-    prompt = `--- Message from ${sender} ---\n${messageText}${fileContext}`;
+    const userMeta = TEAM_MODE && userInfo ? `[team_user:${userInfo.id}:${userInfo.name}]\n` : '';
+    prompt = `${userMeta}--- Message from ${sender} ---\n${messageText}${fileContext}`;
     console.log(`[agent-slack] queuing follow-up on existing process for ${sessionKey}`);
   } else {
     // No active process — resolve persisted session and spawn new streaming process
@@ -528,11 +529,12 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
 
     entry = createStreamingProcess(sessionKey, existingSession, channelConfig.workdir);
     const sender = TEAM_MODE && userInfo ? formatUserContext(userInfo) : USER_NAME;
+    const userMeta = TEAM_MODE && userInfo ? `[team_user:${userInfo.id}:${userInfo.name}]\n` : '';
     let teamContext = '';
     if (TEAM_MODE && userInfo?.context) {
       teamContext = `\n\n--- User context ---\n${userInfo.context}`;
     }
-    prompt = `${channelConfig.systemPrompt}${SLACK_FORMATTING}${teamContext}${threadContext}\n\n--- Message from ${sender} ---\n${messageText}${fileContext}`;
+    prompt = `${channelConfig.systemPrompt}${SLACK_FORMATTING}${teamContext}${threadContext}\n\n${userMeta}--- Message from ${sender} ---\n${messageText}${fileContext}`;
   }
 
   // Show live Slack loading indicator — updates as tools fire
