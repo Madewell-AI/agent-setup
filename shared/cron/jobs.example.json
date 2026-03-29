@@ -18,7 +18,8 @@
       "tz": "America/New_York",
       "prompt": "Good morning! Prepare a brief morning summary: 1) Check today's calendar for meetings. 2) Review unread emails and flag anything urgent. 3) List the top 3 priorities based on open tasks. 4) Note any deadlines coming up this week. Keep it concise — just the highlights.",
       "workdir": "~",
-      "deliver": true
+      "deliver": true,
+      "channel": "notifications"
     },
     {
       "id": "weekly-review",
@@ -28,7 +29,8 @@
       "tz": "America/New_York",
       "prompt": "It's Friday — time for the weekly review. 1) Summarize what was accomplished this week (review daily notes). 2) List any open loops or unfinished tasks. 3) Suggest priorities for next week. 4) Note any patterns or insights worth remembering.",
       "workdir": "~",
-      "deliver": true
+      "deliver": true,
+      "channel": "notifications"
     }
   ]
 }

@@ -17,7 +17,8 @@ Jobs are defined in `~/.agent/cron/jobs.json`:
     "tz": "America/New_York",
     "prompt": "What the agent should do when this job fires",
     "workdir": "~",
-    "deliver": true
+    "deliver": true,
+    "channel": "notifications"
 }
 ```
 
@@ -29,7 +30,8 @@ Fields:
 - `tz` — Timezone for the schedule
 - `prompt` — The natural language instructions for the agent
 - `workdir` — Working directory for the agent session
-- `deliver` — If true, post the output to the Slack notification channel
+- `deliver` — If true, post the output to Slack
+- `channel` — (optional) Target Slack channel name for delivery. Resolved via `config.json` `slack.channels` section or `SLACK_CHANNEL_<NAME>` env var. Falls back to `SLACK_NOTIFICATION_CHANNEL` if unset.
 
 ## Managing Jobs
 

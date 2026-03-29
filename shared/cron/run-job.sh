@@ -49,6 +49,7 @@ fi
 PROMPT=$(echo "$JOB_CONFIG" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['prompt'])")
 WORKDIR=$(echo "$JOB_CONFIG" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('workdir', '$HOME'))")
 DELIVER=$(echo "$JOB_CONFIG" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('deliver', False))")
+JOB_CHANNEL=$(echo "$JOB_CONFIG" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('channel', ''))")
 JOB_NAME=$(echo "$JOB_CONFIG" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['name'])")
 
 # Expand ~ in workdir
@@ -142,13 +143,41 @@ Status: ${STATUS}
 
 $(echo "$OUTPUT" | head -c 2800)"
 
-    if [ -n "${SLACK_BOT_TOKEN:-}" ] && [ -n "${SLACK_NOTIFICATION_CHANNEL:-}" ]; then
-        PAYLOAD=$(python3 -c "import json,sys; print(json.dumps({'channel': '${SLACK_NOTIFICATION_CHANNEL}', 'text': sys.argv[1]}))" "$SUMMARY")
-        curl -s -X POST "https://slack.com/api/chat.postMessage" \
-            -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD" \
-            > /dev/null 2>&1 || echo "[WARN] Slack delivery failed" >> "$LOG_FILE"
+    if [ -n "${SLACK_BOT_TOKEN:-}" ]; then
+        # Per-job channel routing: use job's "channel" field if set, fall back to default
+        TARGET_CHANNEL=""
+        if [ -n "$JOB_CHANNEL" ]; then
+            # Resolve channel name → ID from config.json slack.channels section
+            CONFIG_FILE="${AGENT_DIR}/../../agent-setup/config.json"
+            [ -n "${CONFIG_PATH:-}" ] && CONFIG_FILE="$CONFIG_PATH"
+            if [ -f "$CONFIG_FILE" ]; then
+                TARGET_CHANNEL=$(python3 -c "
+import json, sys
+try:
+    cfg = json.load(open('${CONFIG_FILE}'))
+    channels = cfg.get('slack', {}).get('channels', {})
+    ch = channels.get('${JOB_CHANNEL}', {})
+    print(ch.get('id', ''))
+except: pass
+" 2>/dev/null)
+            fi
+            # If config lookup failed, try SLACK_CHANNEL_<NAME> env var pattern
+            if [ -z "$TARGET_CHANNEL" ]; then
+                ENV_KEY="SLACK_CHANNEL_$(echo "$JOB_CHANNEL" | tr '[:lower:]-' '[:upper:]_')"
+                TARGET_CHANNEL="${!ENV_KEY:-}"
+            fi
+        fi
+        # Final fallback to default notification channel
+        TARGET_CHANNEL="${TARGET_CHANNEL:-${SLACK_NOTIFICATION_CHANNEL:-}}"
+
+        if [ -n "$TARGET_CHANNEL" ]; then
+            PAYLOAD=$(python3 -c "import json,sys; print(json.dumps({'channel': sys.argv[1], 'text': sys.argv[2]}))" "$TARGET_CHANNEL" "$SUMMARY")
+            curl -s -X POST "https://slack.com/api/chat.postMessage" \
+                -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "$PAYLOAD" \
+                > /dev/null 2>&1 || echo "[WARN] Slack delivery failed" >> "$LOG_FILE"
+        fi
     fi
 fi
 

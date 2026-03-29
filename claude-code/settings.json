@@ -39,6 +39,16 @@
                     }
                 ]
             }
+        ],
+        "PermissionRequest": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash ~/.agent/scripts/hooks/permission-request.sh"
+                    }
+                ]
+            }
         ]
     }
 }
