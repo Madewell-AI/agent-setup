@@ -103,6 +103,47 @@ Edit `config.json` to set your:
 - Slack channel mappings
 - Enabled features (memory, cron, workers, webhooks)
 
+### 6. Team Mode (Optional)
+
+Want to share your agent with a whole team? Set `"mode": "team"` in `config.json`:
+
+```json
+{
+  "mode": "team",
+  "assistant": {
+    "name": "Maia",
+    "role": "AI Team Assistant",
+    "vibe": "Helpful, direct, execution-focused"
+  },
+  "team": {
+    "users": {
+      "Sarah Chen": {
+        "role": "Senior Engineer",
+        "context": "Backend lead. Primary languages: Go, Python."
+      },
+      "U08ABC123": {
+        "role": "Product Manager",
+        "context": "Owns the roadmap for the mobile app."
+      }
+    }
+  }
+}
+```
+
+Team mode changes behavior in two ways:
+
+1. *Mention-only activation* — The bot only responds when @mentioned (or in thread follow-ups to an existing conversation). No more accidental triggers from random channel chatter.
+
+2. *User context injection* — Every message includes who sent it (name + role from Slack profile, enriched with any context you define in `config.json`). The agent always knows who it's talking to.
+
+You can key `team.users` by Slack user ID (`U08ABC123`) or display name — both work. The `role` and `context` fields are optional but recommended. If omitted, the bot falls back to the user's Slack profile title.
+
+**Recommended setup for teams:**
+- Dedicated VM (separate from any personal Maia instance)
+- Dedicated email account for the agent (e.g. `maia@yourcompany.com`)
+- Use that email to create GitHub, Vercel, Linear accounts — clean audit trail
+- Scope permissions carefully per integration
+
 ## Documentation
 
 - [Full Setup Guide](docs/setup.md)
@@ -112,6 +153,7 @@ Edit `config.json` to set your:
 - [Cron Jobs](docs/cron.md)
 - [Workers](docs/workers.md)
 - [Skills](docs/skills.md)
+- [Team Mode](docs/team-mode.md)
 - [Security](docs/security.md)
 - [Codex CLI Differences](docs/codex-differences.md)
 

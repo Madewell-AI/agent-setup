@@ -66,6 +66,21 @@ Each entity has:
 - `summary.md` — Narrative overview
 - `items.json` — Atomic facts
 
+### Team Member Profiles (Team Mode)
+Location: `~/life/areas/people/{name-slug}/`
+
+In team mode, the agent creates a knowledge graph entry for each team member it interacts with. Each entry contains:
+- `summary.md` — Name, Slack ID, role, expertise, communication preferences, key interactions
+- `items.json` — Atomic facts (e.g., `{"fact": "Prefers concise bullet-point answers"}`)
+
+Auto-recall automatically loads the current speaker's profile on every message, so the agent always has that person's context without a keyword match. The nightly consolidation cron updates these entries with any new preferences or patterns learned during the day.
+
+To bootstrap, create entries for known team members:
+```bash
+mkdir -p ~/life/areas/people/sarah-chen
+# Write summary.md with their name, Slack ID, role, and any known preferences
+```
+
 ### Session Notes
 Location: `~/sessions/YYYY-MM-DD-slug.md`
 

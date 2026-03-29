@@ -46,6 +46,46 @@ try { config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8')); } catch {}
 const ASSISTANT_NAME = config.assistant?.name || 'Agent';
 const USER_NAME = config.user?.name || 'User';
 const AGENT_DIR = (config.paths?.agent_dir || '~/.agent').replace(/^~/, os.homedir());
+const TEAM_MODE = config.mode === 'team';
+const TEAM_USERS = config.team?.users || {};
+
+// ---------------------------------------------------------------------------
+// Team mode — resolve Slack user to display name and role
+// ---------------------------------------------------------------------------
+const userInfoCache = new Map();
+
+async function resolveSlackUser(client, userId) {
+  if (userInfoCache.has(userId)) return userInfoCache.get(userId);
+  try {
+    const res = await client.users.info({ user: userId });
+    const u = res.user || {};
+    const info = {
+      id: userId,
+      name: u.real_name || u.profile?.real_name || u.name || userId,
+      displayName: u.profile?.display_name || u.real_name || u.name || userId,
+      title: u.profile?.title || '',
+    };
+    // Overlay config-defined role/context if present
+    const teamEntry = TEAM_USERS[userId] || TEAM_USERS[info.name] || TEAM_USERS[info.displayName];
+    if (teamEntry) {
+      info.role = teamEntry.role || info.title;
+      info.context = teamEntry.context || '';
+    } else {
+      info.role = info.title;
+      info.context = '';
+    }
+    userInfoCache.set(userId, info);
+    return info;
+  } catch {
+    return { id: userId, name: userId, displayName: userId, role: '', context: '' };
+  }
+}
+
+function formatUserContext(userInfo) {
+  let line = `${userInfo.name}`;
+  if (userInfo.role) line += ` (${userInfo.role})`;
+  return line;
+}
 
 // ---------------------------------------------------------------------------
 // Detect engine
@@ -380,11 +420,17 @@ function downloadSlackFile(url, destPath) {
 // ---------------------------------------------------------------------------
 // Core message handler
 // ---------------------------------------------------------------------------
-async function processMessage(client, channelId, sessionKey, threadTs, rawText, slackFiles = []) {
+async function processMessage(client, channelId, sessionKey, threadTs, rawText, slackFiles = [], slackUserId = null) {
   const text = rawText.replace(/<@[A-Z0-9]+>/g, '').trim();
   if (!text && slackFiles.length === 0) return;
 
   const channelName = await resolveChannelName(client, channelId);
+
+  // Resolve who sent this message (team mode injects user context into prompt)
+  let userInfo = null;
+  if (TEAM_MODE && slackUserId) {
+    userInfo = await resolveSlackUser(client, slackUserId);
+  }
   const channelConfig = CHANNEL_CONFIG[channelName] || DEFAULT_CONFIG;
 
   // Download attached files to a temp dir
@@ -425,7 +471,9 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
   if (existingProcess && ENGINE === 'claude') {
     // Follow-up turn on active streaming process — light prompt (context already loaded)
     entry = existingProcess;
-    prompt = `--- ${USER_NAME}'s message ---\n${messageText}${fileContext}`;
+    const sender = TEAM_MODE && userInfo ? formatUserContext(userInfo) : USER_NAME;
+    const userMeta = TEAM_MODE && userInfo ? `[team_user:${userInfo.id}:${userInfo.name}]\n` : '';
+    prompt = `${userMeta}--- Message from ${sender} ---\n${messageText}${fileContext}`;
     console.log(`[agent-slack] queuing follow-up on existing process for ${sessionKey}`);
   } else {
     // No active process — resolve persisted session and spawn new streaming process
@@ -480,7 +528,13 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
     console.log(`[agent-slack] message in #${channelName} thread=${threadTs} session=${existingSession || (rawSession?.archived ? 'archived→fresh' : 'new')} files=${slackFiles.length}`);
 
     entry = createStreamingProcess(sessionKey, existingSession, channelConfig.workdir);
-    prompt = `${channelConfig.systemPrompt}${SLACK_FORMATTING}${threadContext}\n\n--- ${USER_NAME}'s message ---\n${messageText}${fileContext}`;
+    const sender = TEAM_MODE && userInfo ? formatUserContext(userInfo) : USER_NAME;
+    const userMeta = TEAM_MODE && userInfo ? `[team_user:${userInfo.id}:${userInfo.name}]\n` : '';
+    let teamContext = '';
+    if (TEAM_MODE && userInfo?.context) {
+      teamContext = `\n\n--- User context ---\n${userInfo.context}`;
+    }
+    prompt = `${channelConfig.systemPrompt}${SLACK_FORMATTING}${teamContext}${threadContext}\n\n${userMeta}--- Message from ${sender} ---\n${messageText}${fileContext}`;
   }
 
   // Show live Slack loading indicator — updates as tools fire
@@ -615,7 +669,7 @@ app.event('app_mention', async ({ event, client }) => {
   if (event.edited) return;
   const threadTs = event.thread_ts || event.ts;
   const key = `${event.channel}:${threadTs}`;
-  await trackedProcessMessage(client, event.channel, key, threadTs, event.text, event.files || []);
+  await trackedProcessMessage(client, event.channel, key, threadTs, event.text, event.files || [], event.user);
 });
 
 // ---------------------------------------------------------------------------
@@ -636,14 +690,25 @@ app.message(async ({ message, client }) => {
   if (message.channel_type === 'im') {
     const key = `${channel}:im`;
     const threadTs = message.ts;
-    await trackedProcessMessage(client, channel, key, threadTs, text, files);
+    await trackedProcessMessage(client, channel, key, threadTs, text, files, message.user);
     return;
   }
 
-  // Channel: any message starts or continues a session
+  // Team mode: only respond in threads that already have an active session
+  // (new conversations must start with an @mention)
+  if (TEAM_MODE) {
+    const threadTs = message.thread_ts;
+    if (!threadTs) return; // top-level message without mention — ignore
+    const key = `${channel}:${threadTs}`;
+    if (!sessions.has(key) && !activeProcesses.has(key)) return; // no existing session — ignore
+    await trackedProcessMessage(client, channel, key, threadTs, text, files, message.user);
+    return;
+  }
+
+  // Personal mode: any message starts or continues a session
   const threadTs = message.thread_ts || message.ts;
   const key = `${channel}:${threadTs}`;
-  await trackedProcessMessage(client, channel, key, threadTs, text, files);
+  await trackedProcessMessage(client, channel, key, threadTs, text, files, message.user);
 });
 
 // ---------------------------------------------------------------------------

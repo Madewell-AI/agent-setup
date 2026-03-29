@@ -15,6 +15,12 @@ Read the template at ~/agent-setup/codex/AGENTS.md.template. Replace all {{VARIA
 - {{TIMEZONE}} → user.timezone
 - {{LOCATION}} → user.location
 - {{USER_ROLE}} → user.role (if set, otherwise remove that line)
+- {{ORG_NAME}} → team.org_name (if set, otherwise assistant.name + "'s team")
+
+Handle mode-conditional blocks:
+- If config.mode is "personal" (or not set): keep `{{#PERSONAL_MODE}}...{{/PERSONAL_MODE}}` content, remove `{{#TEAM_MODE}}...{{/TEAM_MODE}}` blocks entirely (including the tags)
+- If config.mode is "team": keep `{{#TEAM_MODE}}...{{/TEAM_MODE}}` content, remove `{{#PERSONAL_MODE}}...{{/PERSONAL_MODE}}` blocks entirely (including the tags)
+- Remove the conditional tags themselves — only the content inside the active block should remain
 
 Write the result to ~/AGENTS.md
 

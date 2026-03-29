@@ -6,7 +6,7 @@
       "enabled": true,
       "schedule": "0 23 * * *",
       "tz": "America/New_York",
-      "prompt": "Review today's conversations and consolidate them into memory. Steps: 1) Read any session transcripts from today. 2) Write a daily note to ~/memory/YYYY-MM-DD.md summarizing the day's key events, decisions, and open loops. 3) Update ~/life/ knowledge graph entries if any durable facts were learned about projects, people, or areas. 4) Archive completed sessions.",
+      "prompt": "Review today's conversations and consolidate them into memory. Steps: 1) Read any session transcripts from today. 2) Write a daily note to ~/memory/YYYY-MM-DD.md summarizing the day's key events, decisions, and open loops. Note which team members were involved in each interaction (if running in team mode). 3) Update ~/life/ knowledge graph entries if any durable facts were learned about projects, people, or areas. For team members, update their entries at ~/life/areas/people/{name}/summary.md with any new preferences, expertise, or context learned from today's interactions. 4) Archive completed sessions.",
       "workdir": "~",
       "deliver": false
     },

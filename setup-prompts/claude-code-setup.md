@@ -15,6 +15,12 @@ Read the template at ~/agent-setup/claude-code/CLAUDE.md.template. Replace all {
 - {{TIMEZONE}} → user.timezone
 - {{LOCATION}} → user.location
 - {{USER_ROLE}} → user.role (if set, otherwise remove that line)
+- {{ORG_NAME}} → team.org_name (if set, otherwise assistant.name + "'s team")
+
+Handle mode-conditional blocks:
+- If config.mode is "personal" (or not set): keep `{{#PERSONAL_MODE}}...{{/PERSONAL_MODE}}` content, remove `{{#TEAM_MODE}}...{{/TEAM_MODE}}` blocks entirely (including the tags)
+- If config.mode is "team": keep `{{#TEAM_MODE}}...{{/TEAM_MODE}}` content, remove `{{#PERSONAL_MODE}}...{{/PERSONAL_MODE}}` blocks entirely (including the tags)
+- Remove the conditional tags themselves — only the content inside the active block should remain
 
 Write the result to ~/CLAUDE.md
 
@@ -34,8 +40,13 @@ Create the Claude Code memory directory:
 mkdir -p ~/.claude/projects/-home-$(echo $USER | tr '[:upper:]' '[:lower:]' | tr ' ' '-')/memory/
 ```
 
-Read ~/agent-setup/shared/memory/MEMORY.md.template, replace variables, and write to:
+Read ~/agent-setup/shared/memory/MEMORY.md.template, replace variables (including mode-conditional blocks, same as CLAUDE.md), and write to:
 ~/.claude/projects/-home-$(echo $USER | tr '[:upper:]' '[:lower:]' | tr ' ' '-')/memory/MEMORY.md
+
+If in team mode, also create the people directory for team member profiles:
+```
+mkdir -p ~/life/areas/people/
+```
 
 ## Step 6: Set Up Knowledge Graph
 
