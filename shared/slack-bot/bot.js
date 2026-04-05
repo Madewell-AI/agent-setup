@@ -219,8 +219,14 @@ function createStreamingProcess(sessionKey, sessionId, workdir) {
         if (event.type === 'result') {
           entry.sessionId = event.session_id || entry.sessionId;
           let text = event.result || '';
-          if (!text && event.subtype === 'error') {
-            text = `[Error] ${event.error || 'unknown'}`;
+          if (!text && event.is_error) {
+            const errMsg = event.errors?.join('; ') || event.error || 'unknown';
+            // Session not found — flag for immediate fresh retry
+            if (errMsg.includes('No conversation found')) {
+              text = '__SESSION_EXPIRED__';
+            } else {
+              text = `[Error] ${errMsg}`;
+            }
           }
           if (entry.currentTurn) {
             entry.currentTurn.resolve({ text, sessionId: entry.sessionId });
@@ -512,6 +518,17 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
   }
 
   console.log(`[agent-slack] turn done, sessionId=${result.sessionId}, textLen=${result.text.length}${result.killed ? ' (killed)' : ''}`);
+
+  // Session expired — clear stale session and retry immediately with a fresh session
+  if (result.text === '__SESSION_EXPIRED__') {
+    console.log(`[agent-slack] session expired for ${sessionKey} — clearing and retrying fresh`);
+    sessions.delete(sessionKey);
+    saveSessions(sessions);
+    sessionFailures.delete(sessionKey);
+    try { entry.proc.kill('SIGTERM'); } catch {}
+    activeProcesses.delete(sessionKey);
+    return processMessage(client, channelId, sessionKey, threadTs, rawText, slackFiles);
+  }
 
   // Track session health — increment failures on kill/empty, clear on success
   if (result.killed || (result.text.length === 0 && sessions.has(sessionKey))) {

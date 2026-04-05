@@ -1,0 +1,7 @@
+[Unit]
+Description=Agent Reminder Check — fire due reminders
+
+[Service]
+Type=oneshot
+ExecStart=%h/.agent/scripts/reminder.sh check
+Environment=TZ={{TIMEZONE}}
