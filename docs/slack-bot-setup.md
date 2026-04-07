@@ -70,7 +70,7 @@ nano ~/.config/systemd/user/agent-slack.service
 ```
 
 Update the paths in the service file:
-- Replace `YOUR_USERNAME` with your actual username
+- The default paths assume the `maia` user — update if your username is different
 - Update the Node.js path to match your NVM install (run `which node` to find it)
 
 Enable and start:

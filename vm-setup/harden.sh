@@ -78,7 +78,7 @@ echo "  UFW enabled: SSH only (add more rules as needed)"
 
 # 6. Create non-root user (if running as root)
 echo "[6/8] Checking user setup..."
-TARGET_USER="${1:-agent}"
+TARGET_USER="${1:-maia}"
 if ! id "$TARGET_USER" &>/dev/null; then
     echo "  Creating user: $TARGET_USER"
     adduser --disabled-password --gecos "" "$TARGET_USER"

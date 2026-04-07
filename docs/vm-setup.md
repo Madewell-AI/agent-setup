@@ -49,16 +49,16 @@ ssh root@YOUR_SERVER_IP
 ### 5. Run Hardening Script
 ```bash
 # Download and run the hardening script
-# Replace 'myuser' with your desired username
+# Default username is 'maia' — pass a different name if desired
 curl -sL https://raw.githubusercontent.com/madewell-ai/agent-setup/main/vm-setup/harden.sh -o harden.sh
 chmod +x harden.sh
-./harden.sh myuser
+./harden.sh maia
 ```
 
 ### 6. Test Non-Root Access
 In a NEW terminal (keep root session open):
 ```bash
-ssh myuser@YOUR_SERVER_IP
+ssh maia@YOUR_SERVER_IP
 ```
 
 If this works, you can close the root session. If not, troubleshoot before proceeding.
@@ -122,7 +122,7 @@ cloudflared tunnel create my-agent-tunnel
 mkdir -p ~/.cloudflared
 cat > ~/.cloudflared/config.yml <<EOF
 tunnel: YOUR_TUNNEL_ID
-credentials-file: /home/myuser/.cloudflared/YOUR_TUNNEL_ID.json
+credentials-file: /home/maia/.cloudflared/YOUR_TUNNEL_ID.json
 ingress:
   - hostname: agent-webhooks.yourdomain.com
     service: http://localhost:3456
