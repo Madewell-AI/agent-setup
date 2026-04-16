@@ -13,6 +13,7 @@ Maia is an open-source framework for creating a personal AI agent that runs 24/7
 - **Scheduled Jobs** — Cron system for recurring autonomous tasks (morning summaries, inbox triage, etc.)
 - **Webhook Processing** — Receive and act on external events (email, GitHub, etc.)
 - **Skills System** — Modular, markdown-based skill files for domain-specific capabilities
+- **Excalidraw Diagrams** — Self-hosted Excalidraw instance with 1,000+ library icons for programmatic diagram creation
 - **Security** — Trusted channel enforcement, prompt injection defense, VM hardening
 - **Dual Engine Support** — Works with both Claude Code (Anthropic) and Codex CLI (OpenAI)
 
@@ -34,6 +35,7 @@ Your VM / Machine
 │   │   ├── jobs.json          ← Job definitions
 │   │   ├── manage.sh          ← CLI for managing jobs
 │   │   └── run-job.sh         ← Job executor
+│   ├── excalidraw/            ← Self-hosted Excalidraw app (optional)
 │   └── workers/               ← Worker state tracking
 ├── memory/                    ← Daily notes (auto-generated)
 ├── life/                      ← Knowledge graph (PARA method)
@@ -112,6 +114,7 @@ Edit `config.json` to set your:
 - [Cron Jobs](docs/cron.md)
 - [Workers](docs/workers.md)
 - [Skills](docs/skills.md)
+- [Excalidraw Diagrams](docs/excalidraw.md)
 - [Security](docs/security.md)
 - [Codex CLI Differences](docs/codex-differences.md)
 

@@ -39,6 +39,7 @@ Domain knowledge lives in skills. Available skills:
 <!-- - `/cron` — scheduling recurring jobs -->
 <!-- - `/workers` — spawning and checking background workers -->
 <!-- - `/memory` — memory architecture and read/write patterns -->
+<!-- - `/draw` — create and manage Excalidraw diagrams -->
 
 ---
 
