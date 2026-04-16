@@ -1,0 +1,23 @@
+# Systemd user service for the Excalidraw app.
+#
+# Install:
+#   cp draw.service ~/.config/systemd/user/draw.service
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now draw.service
+#
+# Adjust WorkingDirectory and ExecStart paths to match your setup.
+
+[Unit]
+Description=Draw — Excalidraw app
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/draw
+ExecStart=/usr/bin/npx next start -p 3200
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target

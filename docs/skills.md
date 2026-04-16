@@ -102,6 +102,28 @@ description: Read, triage, and respond to emails
 6. NEVER send an email without explicit approval
 ```
 
+### Excalidraw Diagrams
+```markdown
+---
+name: draw
+description: Create, manage, and export Excalidraw diagrams
+argument-hint: "[drawing name or action]"
+allowed-tools: Bash(python3 *), Bash(curl *), Read, Write
+---
+
+# Draw — Excalidraw Diagrams
+
+Create and manage drawings via your self-hosted Excalidraw app.
+
+## Instructions
+1. Search libraries: `python3 compose.py search "query"`
+2. Compose elements: `python3 compose.py "lib/Item" --x X --y Y --size S`
+3. POST to API: `curl -s -X POST http://localhost:3200/api/drawings -d '...'`
+4. Share the URL with the user
+```
+
+See [Excalidraw setup guide](excalidraw.md) for full installation instructions.
+
 ## Best Practices
 
 - Keep skills focused — one domain per skill
