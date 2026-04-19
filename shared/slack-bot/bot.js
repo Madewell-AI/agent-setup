@@ -95,16 +95,44 @@ const DEFAULT_CONFIG = {
 // Appended to every prompt — enforces Slack-compatible output
 const SLACK_FORMATTING = `
 --- Slack Formatting Rules (ALWAYS follow these) ---
-Your response will be posted directly to Slack. Slack uses mrkdwn, NOT standard markdown.
-- Use *bold* for emphasis (not **bold**)
-- Use _italic_ for italics (not *italic*)
-- Use \`inline code\` for code snippets
-- Use \`\`\`code blocks\`\`\` for multi-line code
-- Bullet lists: use - or • at the start of lines
-- NEVER use markdown tables (| col | col | format). Slack does not render them and they look broken. Always use labeled lines or bullet lists instead. This is a hard rule — no exceptions.
-- NO # headers — use *bold text* as section labels instead
+Your response posts directly to Slack. You have TWO output modes — pick the one that best fits the reply.
+
+*Mode 1: Plain text (mrkdwn)* — default for short/simple replies
+- *bold*, _italic_, \`inline code\`, \`\`\`code blocks\`\`\`
+- Bullet lists: - or • at start of lines
+- NO # headers — use *bold* as section labels, or a \`header\` block in Mode 2
 - NO HTML tags
-- Keep responses concise — this is a chat interface`;
+- NO markdown tables (| col | col |) — Slack does NOT render them. Use a \`rich_text\` list or \`section\` \`fields\` instead.
+- Keep concise — this is chat
+
+*Mode 2: Block Kit* — for rich UI. Emit ONE fenced JSON array of blocks:
+\`\`\`slack-blocks
+[{"type":"header","text":{"type":"plain_text","text":"Confirm send"}},{"type":"section","text":{"type":"mrkdwn","text":":warning: About to send email to *3 external recipients* — confirm?"}}]
+\`\`\`
+Blocks pass straight through to Slack's \`chat.postMessage\` — ONLY native Block Kit types work. Anything else returns \`invalid_blocks\` and the whole message fails. Always include a short plain-text summary OUTSIDE the fence as the notification/accessibility fallback.
+
+Native block types (the ONLY types Slack accepts):
+- *header* — large heading. \`text: { type: "plain_text", text: "..." }\`. Max 150 chars, plain_text only.
+- *section* — text + optional \`accessory\` (button/image/overflow/select/datepicker). \`text\` is \`mrkdwn\` or \`plain_text\` (max 3000 chars). Also supports \`fields\`: up to 10 mrkdwn objects rendered as a 2-column grid — great for key/value layouts.
+- *divider* — horizontal rule, no content.
+- *context* — small muted metadata line. \`elements\`: up to 10 \`mrkdwn\`, \`plain_text\`, or \`image\` items. Use for timestamps, sources, attribution.
+- *image* — standalone image. Requires \`alt_text\` + either \`image_url\` or \`slack_file\`. Optional \`title\` (plain_text).
+- *actions* — row of interactive elements (button, static_select, users_select, datepicker, overflow, radio_buttons, checkboxes). Max 25 elements.
+- *rich_text* — inline styled content. \`elements\`: \`rich_text_section\`, \`rich_text_list\` (\`style\`: "bullet" or "ordered", supports nesting via \`indent\`), \`rich_text_quote\`, \`rich_text_preformatted\`. Inside sections: \`{type:"text",text,style:{bold,italic,code,strike}}\`, \`{type:"link",url,text}\`, \`{type:"emoji",name}\`, \`{type:"user",user_id}\`, \`{type:"channel",channel_id}\`.
+- *markdown* — full CommonMark markdown block. Good for syntax-highlighted code, nested lists, real links. (Renders as markdown, not Slack mrkdwn.)
+- *video* — embedded video. Requires \`video_url\`, \`thumbnail_url\`, \`alt_text\`, \`title\` (plain_text).
+- *file* — embed a file by \`external_id\` + \`source: "remote"\`.
+- *input* — form input. Modals / App Home only; ignored in regular chat messages.
+
+Block rules:
+- Pick ONLY from the list above — do NOT invent types like \`alert\`, \`card\`, \`carousel\`, \`table\`, \`plan\`, \`task_card\`. Slack rejects the whole message with \`invalid_blocks\` if any single block is invalid.
+- Don't force blocks for a one-line reply — plain text is fine.
+- All \`block_id\` and \`action_id\` values must be unique within a message.
+- Message limit: 50 blocks total.
+- Card-like UI: combine \`header\` + \`section\` (with \`accessory: {type:"image",image_url,alt_text}\`) + \`context\`.
+- Tabular data: \`section\` with \`fields\` (2-column) for short tables; \`rich_text\` list for longer ones. Markdown pipe tables will NOT render.
+- Status/callout UI: leading emoji (\`:white_check_mark:\`, \`:warning:\`, \`:x:\`, \`:information_source:\`) inside a \`section\` replaces the old \`alert\` concept.
+- Ref: https://docs.slack.dev/reference/block-kit/blocks`;
 
 // ---------------------------------------------------------------------------
 // Session store — key → claude session_id, persisted to disk
@@ -563,6 +591,26 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
     cleanText = cleanText.replace(/\[RESTART\]/g, '').trim();
   }
 
+  // Parse ```slack-blocks JSON fences — the agent emits these for Block Kit UI.
+  // Each fence becomes one separate post. Only native Slack Block Kit types work;
+  // invented types (alert/card/carousel/table/etc.) cause invalid_blocks and the
+  // whole message fails — the SLACK_FORMATTING prompt enforces this.
+  const BLOCK_FENCE_RE = /```slack-blocks\s*\n([\s\S]*?)\n```/gi;
+  const parsedBlockGroups = [];
+  let fenceMatch;
+  while ((fenceMatch = BLOCK_FENCE_RE.exec(cleanText)) !== null) {
+    try {
+      const parsed = JSON.parse(fenceMatch[1]);
+      const arr = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.blocks)) ? parsed.blocks : null;
+      if (arr && arr.length > 0) parsedBlockGroups.push(arr);
+    } catch (err) {
+      console.error('[agent-slack] slack-blocks JSON parse failed:', err.message);
+    }
+  }
+  if (parsedBlockGroups.length > 0) {
+    cleanText = cleanText.replace(BLOCK_FENCE_RE, '').trim();
+  }
+
   // Slack max message length is 4000 chars — chunk if needed
   const MAX = 3900;
   const chunks = [];
@@ -570,7 +618,7 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
     chunks.push(cleanText.slice(i, i + MAX));
   }
   // If empty (e.g. killed mid-run), post nothing
-  if (chunks.length === 0 && attachPaths.length === 0) return;
+  if (chunks.length === 0 && attachPaths.length === 0 && parsedBlockGroups.length === 0) return;
 
   try {
     for (const chunk of chunks) {
@@ -580,6 +628,26 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
         thread_ts: threadTs,
         text: chunk,
       });
+    }
+    // Post Block Kit groups after the plain-text fallback
+    for (const blocks of parsedBlockGroups) {
+      const fallback = cleanText ? cleanText.slice(0, 200) : 'Rich message';
+      try {
+        await client.chat.postMessage({
+          channel: channelId,
+          thread_ts: threadTs,
+          blocks,
+          text: fallback,
+        });
+      } catch (err) {
+        console.error('[agent-slack] blocks postMessage failed:', err.message);
+        // Fall back to a visible error so the message isn't lost silently
+        await client.chat.postMessage({
+          channel: channelId,
+          thread_ts: threadTs,
+          text: `[Block Kit post failed: ${err.message}]`,
+        });
+      }
     }
     // Upload any files the agent wants to send back
     for (const filePath of attachPaths) {
@@ -599,7 +667,7 @@ async function processMessage(client, channelId, sessionKey, threadTs, rawText, 
         console.error(`[agent-slack] Failed to upload ${filePath}:`, err.message);
       }
     }
-    console.log(`[agent-slack] response posted (${chunks.length} chunk(s), ${attachPaths.length} file(s))`);
+    console.log(`[agent-slack] response posted (${chunks.length} chunk(s), ${parsedBlockGroups.length} block group(s), ${attachPaths.length} file(s))`);
 
     // Deferred restart — triggered by [RESTART] marker in response
     if (needsRestart) {
