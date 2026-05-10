@@ -14,6 +14,7 @@ Maia is an open-source framework for creating a personal AI agent that runs 24/7
 - **Webhook Processing** — Receive and act on external events (email, GitHub, etc.)
 - **Skills System** — Modular, markdown-based skill files for domain-specific capabilities
 - **Excalidraw Diagrams** — Self-hosted Excalidraw instance with 1,000+ library icons for programmatic diagram creation
+- **Disk Management** — Automated disk monitoring, cleanup scripts, and low-space Slack alerts
 - **Security** — Trusted channel enforcement, prompt injection defense, VM hardening
 - **Dual Engine Support** — Works with both Claude Code (Anthropic) and Codex CLI (OpenAI)
 
@@ -30,7 +31,10 @@ Your VM / Machine
 │   │   ├── feedback-detector.py ← Correction detection + feedback queue
 │   │   ├── process-feedback.py  ← Review + persist queued corrections
 │   │   ├── spawn-worker.sh    ← Background task spawner
-│   │   └── heartbeat.sh       ← Worker health monitor
+│   │   ├── heartbeat.sh       ← Worker health monitor
+│   │   ├── disk-status.sh     ← Disk usage report
+│   │   ├── disk-cleanup.sh    ← Safe cache/artifact cleanup
+│   │   └── disk-warn.sh       ← Low-disk Slack alert (for cron)
 │   ├── cron/                  ← Scheduled job system
 │   │   ├── jobs.json          ← Job definitions
 │   │   ├── manage.sh          ← CLI for managing jobs
