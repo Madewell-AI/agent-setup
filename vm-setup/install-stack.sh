@@ -83,6 +83,11 @@ mkdir -p "$HOME"/{memory,life/{projects,areas/{companies,people,operations,perso
 # Create .env template
 if [ ! -f "$AGENT_DIR/.env" ]; then
     cat > "$AGENT_DIR/.env" <<'ENVEOF'
+# Claude Code OAuth Token — required for headless claude -p subprocess auth
+# Run `claude setup-token` in a real terminal to get this token.
+# Without it, cron jobs and Slack bot subprocess calls will 401.
+# CLAUDE_CODE_OAUTH_TOKEN=sk-ant-oat01-...
+
 # Slack Bot Credentials (for notifications)
 # SLACK_BOT_TOKEN=xoxb-your-token
 # SLACK_NOTIFICATION_CHANNEL=C0000000000

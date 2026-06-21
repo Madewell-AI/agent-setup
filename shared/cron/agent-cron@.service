@@ -1,0 +1,14 @@
+[Unit]
+Description=Maia cron job: %i
+After=network-online.target
+
+[Service]
+Type=oneshot
+# %i is the job ID passed via the instance name (e.g. maia-cron@nightly-digest.service)
+ExecStart=/bin/bash /home/maia/.agent/cron/run-job.sh %i
+WorkingDirectory=/home/maia
+StandardOutput=journal
+StandardError=journal
+Environment=HOME=/home/maia
+# EnvironmentFile ensures CLAUDE_CODE_OAUTH_TOKEN is available to claude -p subprocesses
+EnvironmentFile=/home/maia/.agent/.env
