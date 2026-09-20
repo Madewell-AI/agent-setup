@@ -149,6 +149,37 @@ Hetzner offers snapshots — take one after initial setup:
 - Check memory: `free -h`
 - Check agent services: `systemctl --user list-units --type=service`
 
+### DNS Hygiene (After Decommissioning Services)
+
+When you archive a repo or shut down a service, orphaned DNS records often remain pointing at dead deployments. Left uncleaned, these cause confusion and waste DNS quota.
+
+**When to run:** After archiving repos, deleting Vercel/Render/Railway deployments, or shutting down any service with a subdomain.
+
+**Steps:**
+
+1. List all DNS records for your domain (via Cloudflare dashboard or API)
+2. For each subdomain, test if it resolves to something live:
+   ```bash
+   curl -o /dev/null -s -w "%{http_code}" https://subdomain.yourdomain.com
+   ```
+   - `404` from Vercel with "deployment could not be found" → orphaned, safe to delete
+   - `404` from your own app → keep (app is live, just returning 404)
+   - Tunnel-backed records (CNAME to `*.cfargotunnel.com`) → only delete if the tunnel is also gone
+3. Delete confirmed orphans via the Cloudflare dashboard or API
+
+**Via Cloudflare API:**
+```bash
+# List records
+curl -s -X GET "https://api.cloudflare.com/client/v4/zones/{{ZONE_ID}}/dns_records" \
+  -H "Authorization: Bearer {{CF_API_TOKEN}}" | jq '.result[] | {name, type, content}'
+
+# Delete a record
+curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/{{ZONE_ID}}/dns_records/{{RECORD_ID}}" \
+  -H "Authorization: Bearer {{CF_API_TOKEN}}"
+```
+
+Tip: Your agent can automate this — ask it to "find and delete orphaned DNS records" after any decommission.
+
 ### Updating the Framework
 ```bash
 cd ~/agent-setup
